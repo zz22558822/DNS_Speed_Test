@@ -1,22 +1,3 @@
-/*
- * DoHSpeedTest - Real-time DNS over HTTPS (DoH) Speed Testing Tool
- * Copyright (C) 2023 Silviu Stroe
- *
- * This file is part of DoHSpeedTest.
- *
- * DoHSpeedTest is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * DoHSpeedTest is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with DoHSpeedTest. If not, see <http://www.gnu.org/licenses/>.
- */
 const checkButton = document.getElementById('checkButton');
 const editButton = document.getElementById('editButton');
 const topWebsites = ['google.com', 'youtube.com', 'facebook.com', 'amazon.com', 'yahoo.com', 'wikipedia.org', 'twitter.com', 'instagram.com', 'linkedin.com', 'netflix.com'];
@@ -93,11 +74,17 @@ let dnsChart;
 
 function updateChartWithData(server) {
     const chartContainer = document.getElementById('chartContainer');
+    const dnsResults = document.getElementById('dnsResults');
     const ctx = document.getElementById('dnsChart').getContext('2d');
 
     // Display the chart container if it's hidden and there's valid data
-    if (server.speed.min !== 'Unavailable' && window.innerWidth > 768) {
+    if (server.speed.min !== '無法連接' && window.innerWidth > 768) {
         chartContainer.classList.remove('hidden');
+    }
+
+    // 如果 Tabel 隱藏且有數據則顯示
+    if (server.speed.min !== '無法連接') {
+        dnsResults.classList.remove('hidden');
     }
 
     // Initialize the chart if it doesn't exist, with the new line chart structure
@@ -133,7 +120,7 @@ function updateChartWithData(server) {
     const serverIndex = dnsChart.data.datasets.findIndex(dataset => dataset.label === server.name);
 
     // Prepare the server data for the chart (speed results for each website)
-    const serverData = server.individualResults.map(result => result.speed === 'Unavailable' ? null : result.speed);
+    const serverData = server.individualResults.map(result => result.speed === '無法連接' ? null : result.speed);
 
     if (serverIndex === -1) {
         // If the server is not in the chart, add it as a new dataset
@@ -167,7 +154,7 @@ async function warmUpDNSServers() {
     const warmUpPromises = dnsServers.map(server => Promise.all(topWebsites.map(website => measureDNSSpeed(server.url, website, server.type, server.allowCors))));
 
     await Promise.all(warmUpPromises);
-    console.log("Warm-up phase completed");
+    console.log("初始化階段完成");
 }
 
 async function updateLoadingMessage(message) {
@@ -183,9 +170,9 @@ checkButton.addEventListener('click', async function () {
     editButton.disabled = true; // Disable the Edit button
     document.getElementById('loadingMessage').classList.remove('hidden');
 
-    await updateLoadingMessage('Warming up DNS servers');
+    await updateLoadingMessage('初始化 DNS 伺服器');
     await warmUpDNSServers();
-    await updateLoadingMessage('Analyzing DNS servers');
+    await updateLoadingMessage('分析 DNS 伺服器');
     await performDNSTests();
 
     document.getElementById('loadingMessage').classList.add('hidden');
@@ -201,7 +188,7 @@ async function performDNSTests() {
         // Map each website to its speed result for the current server
         server.individualResults = topWebsites.map((website, index) => {
             const speed = speedResults[index];
-            return {website, speed: speed !== null ? speed : 'Unavailable'};
+            return {website, speed: speed !== null ? speed : '無法連接'};
         });
 
         const validResults = speedResults.filter(speed => speed !== null && typeof speed === 'number');
@@ -214,7 +201,7 @@ async function performDNSTests() {
 
             server.speed = {min, median, max};
         } else {
-            server.speed = {min: 'Unavailable', median: 'Unavailable', max: 'Unavailable'};
+            server.speed = {min: '無法連接', median: '無法連接', max: '無法連接'};
         }
 
         updateResult(server);
@@ -326,21 +313,21 @@ function updateResult(server) {
     row.innerHTML = `
         <td class="text-left py-2 px-4 dark:text-gray-300">${server.name} 
         <span class="copy-icon" onclick="copyToClipboard('DoH Server URL: ${server.url}' + '\\n' + 'IP Addresses: ${server.ips.join(', ')}', this)">📋</span></td>
-        <td class="text-center py-2 px-4 dark:text-gray-300">${server.speed.min !== 'Unavailable' ? server.speed.min.toFixed(2) : 'Unavailable'}</td>
-        <td class="text-center py-2 px-4 dark:text-gray-300">${server.speed.median !== 'Unavailable' ? server.speed.median.toFixed(2) : 'Unavailable'}</td>
-        <td class="text-center py-2 px-4 dark:text-gray-300">${server.speed.max !== 'Unavailable' ? server.speed.max.toFixed(2) : 'Unavailable'}</td>
+        <td class="text-center py-2 px-4 dark:text-gray-300 ${server.speed.min !== '無法連接' ? "" : 'red'}">${server.speed.min !== '無法連接' ? server.speed.min.toFixed(2) : '無法連接'}</td>
+        <td class="text-center py-2 px-4 dark:text-gray-300 ${server.speed.median !== '無法連接' ? "" : 'red'}">${server.speed.median !== '無法連接' ? server.speed.median.toFixed(2) : '無法連接'}</td>
+        <td class="text-center py-2 px-4 dark:text-gray-300 ${server.speed.max !== '無法連接' ? "" : 'red'}">${server.speed.max !== '無法連接' ? server.speed.max.toFixed(2) : '無法連接'}</td>
     `;
 
     // Populate the detailed view with timings for each hostname
     detailsRow.innerHTML = `
     <td colspan="4" class="py-2 px-4 dark:bg-gray-800 dark:text-gray-300">
-        <div>Timings for each hostname:</div>
+        <div>所有主機的延遲時間:</div>
         <ul>
             ${server.individualResults.map(result => {
         if (typeof result.speed === 'number') {
             return `<li>${result.website}: ${result.speed.toFixed(2)} ms</li>`;
         } else {
-            return `<li>${result.website}: Unavailable</li>`;
+            return `<li>${result.website}: <span class="red">無法連接</span></li>`;
         }
     }).join('')}
         </ul>
@@ -383,9 +370,9 @@ function sortTable(columnIndex) {
         let valA = cellA.textContent.trim();
         let valB = cellB.textContent.trim();
 
-        // Convert 'Unavailable' to a high number for sorting
-        valA = valA === 'Unavailable' ? Infinity : parseFloat(valA) || 0;
-        valB = valB === 'Unavailable' ? Infinity : parseFloat(valB) || 0;
+        // Convert '無法連接' to a high number for sorting
+        valA = valA === '無法連接' ? Infinity : parseFloat(valA) || 0;
+        valB = valB === '無法連接' ? Infinity : parseFloat(valB) || 0;
 
         if (valA < valB) return -1;
         if (valA > valB) return 1;
@@ -417,17 +404,18 @@ function copyToClipboard(text, buttonElement) {
     });
 }
 
-document.getElementById('cta').addEventListener('click', function () {
-    if (navigator.share) {
-        navigator.share({
-            title: 'Find the Fastest DNS Server for You',
-            text: 'Check out this tool to find the fastest DNS server for your location!',
-            url: window.location.href
-        }).then(() => {
-            console.log('Thanks for sharing!');
-        }).catch(console.error);
-    }
-});
+// // 點擊標題分享
+// document.getElementById('cta').addEventListener('click', function () {
+//     if (navigator.share) {
+//         navigator.share({
+//             title: 'Find the Fastest DNS Server for You',
+//             text: 'Check out this tool to find the fastest DNS server for your location!',
+//             url: window.location.href
+//         }).then(() => {
+//             console.log('Thanks for sharing!');
+//         }).catch(console.error);
+//     }
+// });
 
 // Add this at the top of your script, after the global variable declarations
 window.addEventListener('resize', function () {
@@ -478,7 +466,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
             const removeBtn = document.createElement("button");
             removeBtn.className = 'bg-red-500 text-white rounded px-2 py-1 hover:bg-red-600 dark:bg-red-700 dark:hover:bg-red-800';
-            removeBtn.textContent = 'Delete';
+            removeBtn.textContent = '🗑️ 刪除';
             removeBtn.onclick = function () {
                 topWebsites.splice(index, 1);
                 renderList();
@@ -529,10 +517,10 @@ document.addEventListener('DOMContentLoaded', function () {
                 topWebsites.push(host);
                 renderList();
             } else {
-                alert("This website is already in the list.");
+                sweetalert_NO("該網站已在清單列表中");
             }
         } else {
-            alert("Please enter a valid URL or hostname.");
+            sweetalert_error("請輸入有效的網址或主機名稱");
         }
         input.value = ''; // Clear the input field
     }
@@ -548,3 +536,24 @@ document.addEventListener('DOMContentLoaded', function () {
         dnsChart.resetZoom();
     });
 });
+
+// sweetalert2 警告
+function sweetalert_NO(params) {
+	Swal.fire({
+		icon: 'warning',
+		title: params,
+        confirmButtonText: '確定',
+		// showConfirmButton: false, // 自動關閉
+		// timer: 1000
+	})
+}
+// sweetalert2 錯誤
+function sweetalert_error(params) {
+	Swal.fire({
+		icon: 'error',
+		title: params,
+        confirmButtonText: '確定',
+		// showConfirmButton: false, // 自動關閉
+		// timer: 1000
+	})
+}

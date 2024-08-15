@@ -1,15 +1,34 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-Hant-TW">
 <head>
     <meta charset="UTF-8">
+    <title>DNS 速度測試器</title>
+
+    <link rel="icon" href="images/DNS Speed Test.png">
+
+    <meta name="color-scheme" content="light dark">
+    <meta name="author" content="chek">
+    <meta name="copyright" content="chek">
+    <meta name="generator" content="chek">
+    <meta name="description" content="DNS Speed Test">
+    <meta name="keywords" content="DNS Speed Test,DNS,Speed Test">
+
+    <meta property="og:title" content="DNS 速度測試器">
+    <meta property="og:description" content="DNS Speed Test">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="#">
+    <meta property="og:image" href="images/DNS Speed Test.png">
+    <link href="images/DNS Speed Test.png" rel="apple-touch-icon" />
+
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description"
-          content="Experience the only web-based DNS Speed Test. Find the fastest DNS server for your location without any installations or downloads.">
-    <meta name="keywords" content="DNS Speed Test, DNS Server, Fast DNS, Internet Speed, DNS Performance">
-    <meta name="author" content="@SilviuStroe">
-    <title>Fastest DNS Speed Test - Find Optimal DNS Server | No Install</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- CSS -->
     <style>
+        body {
+            font-family: "Helvetica", "Arial","LiHei Pro","黑體-繁","微軟正黑體", sans-serif;
+        }
+
         button:disabled {
             opacity: 0.5;
             cursor: not-allowed;
@@ -50,6 +69,54 @@
             animation-delay: 0s;
         }
 
+        #checkButton {
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+
+        #loadingMessage {
+            font-size: 2em;
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+        .loadingMessageCenter{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .copy-icon {
+            display: inline-block;
+            margin-left: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .copy-icon:hover {
+            transform: scale(1.1);
+        }
+
+        #editButton {
+            transition: all 0.2s;
+        }
+
+        #editButton:hover {
+            transform: scale(1.1);
+        }
+
+        h1, button, p.text-lg.mx-auto{
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            user-select: none;
+            -webkit-user-drag: none;
+        }
+
+        .red {
+            color: rgb(218, 65, 65);
+        }
+
         @keyframes dot-blink {
             0%, 100% {
                 opacity: 0;
@@ -59,46 +126,21 @@
             }
         }
     </style>
-    <link rel="apple-touch-icon" sizes="180x180" href="favicon/apple-touch-icon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="favicon/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="favicon/favicon-16x16.png">
-    <link rel="manifest" href="favicon/site.webmanifest">
-    <script type="application/ld+json">
-        {
-            "@context": "http://schema.org",
-            "@type": "SoftwareApplication",
-            "name": "DNS Speed Test",
-            "description": "Discover the fastest DNS server for your specific location with our advanced DNS Speed Test tool. Enhance your browsing speed and internet reliability effortlessly.",
-            "url": "https://dnsspeedtest.online/",
-            "author": {
-                "@type": "Person",
-                "name": "@SilviuStroe"
-            },
-            "applicationCategory": "WebApplication",
-            "operatingSystem": "All",
-            "offers": {
-                "@type": "Offer",
-                "price": "0",
-                "priceCurrency": "USD"
-            }
-        }
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-zoom/2.0.1/chartjs-plugin-zoom.min.js"></script>
+
 </head>
-<body class="pt-20 font-sans text-center p-5 bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200">
+<body class="pt-5 font-sans text-center p-5 bg-gray-100 text-gray-800 dark:bg-gray-800 dark:text-gray-200">
 <div class="flex justify-center items-center">
     <div class="w-full md:w-2/3 mx-auto">
-        <h1 id="cta" class="text-4xl text-blue-500 font-bold mb-2 text-center dark:text-blue-300">
-            DNS Speed Test Benchmark - Find the Fastest DNS Server for Your Location
+        <h1 id="cta" class="text-4xl text-blue-500 font-bold mb-5 text-center dark:text-blue-300">
+            DNS 速度測試器
         </h1>
     </div>
 </div>
-<p class="text-lg mx-auto mb-5 leading-relaxed max-w-xl dark:text-gray-300">Optimize your internet experience by finding
-    the fastest DNS server for your location. Just click the button below to start the test.</p>
+<p class="text-lg mx-auto leading-relaxed max-w-xl dark:text-gray-300">透過此工具可以找出與您的 ISP 最快的 DNS 服務商</p>
+<p class="text-lg mx-auto mb-5 leading-relaxed max-w-xl dark:text-gray-300">點擊下面的按鈕即可開始測試</p>
 <button id="checkButton"
         class="bg-green-500 text-white py-3 px-6 text-lg rounded-lg shadow-lg transform transition duration-300 ease-in-out hover:scale-105 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-700 focus:ring-opacity-50 mb-5 dark:bg-green-600 dark:hover:bg-green-800">
-    Check DNS Speed
+    開始測試 🚀
 </button>
 <div class="absolute top-5 right-5">
     <div class="group relative inline-block">
@@ -107,60 +149,62 @@
             🛠️
         </button>
         <span class="pointer-events-none absolute top-full right-0 transform translate-y-2 w-max bg-black text-white text-xs rounded py-1 px-2 opacity-0 group-hover:opacity-100 transition-opacity">
-            Edit hosts list
+            編輯主機列表
         </span>
     </div>
 </div>
-<div id="loadingMessage" class="hidden"></div>
+<div id="loadingMessage" class="loadingMessageCenter hidden"></div>
 <!-- Modal -->
 <div id="websiteModal" class="hidden fixed z-50 inset-0 flex items-center justify-center bg-black bg-opacity-60">
     <div class="modal-content relative bg-white pt-4 pb-2 px-4 rounded-lg shadow-xl w-full sm:w-11/12 md:w-1/2 mx-auto my-2 sm:my-4 overflow-hidden dark:bg-gray-700 dark:text-white">
         <span class="close absolute top-2 right-2 text-3xl font-bold text-gray-500 hover:text-black cursor-pointer p-1 dark:text-gray-200 dark:hover:text-white">×</span>
-        <h2 class="text-2xl sm:text-3xl mb-2 sm:mb-4 font-semibold dark:text-gray-200">Edit DNS Test Hosts</h2>
-        <p class="mb-2 sm:mb-4 text-base sm:text-lg leading-relaxed dark:text-gray-300">
-            Add or remove hostnames to tailor DNS server testing. Incorporate websites you frequently visit or popular
-            services to refine the accuracy of your DNS speed test.
+        <h2 class="text-2xl sm:text-3xl mb-2 sm:mb-4 font-semibold dark:text-gray-200">編輯測試主機</h2>
+        <p class="text-base sm:text-lg leading-relaxed dark:text-gray-300">
+            新增或移除主機名稱以調整 DNS 伺服器測試。
         </p>
-        <!-- Scrollable List Container -->
-        <div class="overflow-auto max-h-[50vh] sm:max-h-[60vh]"> <!-- Adjust max height as needed -->
+        <p class="mb-2 sm:mb-4 text-base sm:text-lg leading-relaxed dark:text-gray-300">
+        將您經常造訪的網站或熱門服務納入測試，以提高 DNS 速度測試的準確性。
+        </p>
+        <!-- 滾動式清單容器 -->
+        <div class="overflow-auto max-h-[50vh] sm:max-h-[60vh]"> <!-- 根據需要調整最大高度 -->
             <ul id="websiteList" class="list-none p-0">
-                <!-- Dynamic list items will be added here -->
+                <!-- 動態新增項目 -->
             </ul>
         </div>
-        <div class="flex mt-2 sm:mt-4 justify-center">
+        <div class="flex mt-2 mb-4 sm:mt-4 justify-center">
             <input type="text" id="newWebsite"
                    class="py-2 mr-2 px-4 w-3/4 border-2 border-gray-400 rounded focus:border-blue-500 focus:outline-none transition duration-200 ease-in-out placeholder-gray-600 dark:bg-gray-800 dark:border-gray-600 dark:placeholder-gray-400"
-                   placeholder="Add new hostname...">
+                   placeholder="請輸入主機名稱...">
             <button id="addHostname"
                     class="py-2 px-6 bg-green-500 text-white rounded hover:bg-green-600 text-lg dark:bg-green-700 dark:hover:bg-green-900">
-                Add
+                新增
             </button>
         </div>
     </div>
 </div>
-<div id="dnsResults" aria-live="polite" class="mt-5 overflow-x-auto">
+<div id="dnsResults" aria-live="polite" class="mt-5 mb-5 overflow-x-auto hidden">
     <table id="resultsTable" class="w-full border-collapse table-fixed">
         <thead>
         <tr>
             <th class="w-1/3 py-2 px-4 text-left border-b border-gray-300 bg-blue-200 text-gray-700 cursor-pointer dark:bg-gray-800 dark:text-gray-200">
-                DNS Server
+                DNS 伺服器
             </th>
             <th onclick="sortTable(1)"
                 class="py-2 px-4 text-center border-b border-gray-300 bg-blue-200 text-gray-700 cursor-pointer dark:bg-gray-800 dark:text-gray-200">
-                Min (ms) &#x2195;
+                最小延遲 (ms) &#x2195;
             </th>
             <th onclick="sortTable(2)"
                 class="py-2 px-4 text-center border-b border-gray-300 bg-blue-200 text-gray-700 cursor-pointer dark:bg-gray-800 dark:text-gray-200">
-                Median (ms) &#x2195;
+                平均延遲 (ms) &#x2195;
             </th>
             <th onclick="sortTable(3)"
                 class="py-2 px-4 text-center border-b border-gray-300 bg-blue-200 text-gray-700 cursor-pointer dark:bg-gray-800 dark:text-gray-200">
-                Max (ms) &#x2195;
+                最大延遲 (ms) &#x2195;
             </th>
         </tr>
         </thead>
         <tbody class="text-gray-800 dark:text-gray-200">
-        <!-- Table rows will be dynamically added here -->
+        <!-- 這邊為動態新增的表格資料 -->
         </tbody>
     </table>
 </div>
@@ -168,56 +212,40 @@
     <canvas id="dnsChart" class="w-full h-96"></canvas>
     <button id="resetZoom"
             class="mt-3 bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 dark:bg-blue-700 dark:hover:bg-blue-800">
-        Reset Zoom
+        重置圖表
     </button>
 </div>
 <div id="disclaimer"
      class="mt-10 px-5 py-4 bg-white border border-gray-300 rounded text-left max-w-4xl mx-auto leading-relaxed space-y-4 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-200">
-    <h2 class="text-2xl text-blue-500 mb-4 dark:text-blue-400">Disclaimer</h2>
-    <p>This <strong>DNS Speed Test tool</strong> operates client-side, directly testing DNS servers from your local
-        environment to ensure <strong>accurate real-world results</strong>. It supports <strong>DNS over HTTPS
-            (DoH)</strong>, enhancing privacy and security by encrypting DNS requests and responses.</p>
+<h2 class="text-2xl text-blue-500 mb-4 dark:text-blue-400">免責聲明</h2>
+<p><strong>介紹：</strong><br>
+    DNS 速度測試器在客戶端運行，直接從本地環境測試 DNS 伺服器，以確保結果的準確性。<br>
+    它支持 DNS over HTTPS (DoH) 協議，通過加密 DNS 請求和響應來增強隱私和安全性。</p>
 
-    <p>Local network conditions like latency and bandwidth can influence <strong>DNS speed test results</strong>. Our
-        tool measures DNS resolution speed from your <strong>current location and network environment</strong>, offering
-        a personalized performance assessment.</p>
+<p><strong>注意事項：</strong><br>
+    本地網路條件（如延遲和頻寬）可能會影響 DNS 速度測試結果。<br>
+    此工具主要用於測量當前位置和網路環境中的 DNS 解析速度，提供最佳的性能評估。</p>
 
-    <p><strong>Warm-Up Phase:</strong> To ensure the most accurate results, our tool initiates a warm-up phase before
-        the actual DNS speed test. This phase prepares the DNS servers and stabilizes network conditions, which is
-        crucial for consistent and reliable measurements. Please note that this process adds a short additional delay to
-        the total test duration, contributing to the overall accuracy of the test results.</p>
+<p><strong>初始化階段：</strong><br>
+    為了確保結果的準確性，我們的工具在進行實際的 DNS 速度測試之前會啟動一個初始化階段。<br>
+    這一階段會準備 DNS 伺服器並穩定網路條件，這對於獲得可靠的測量結果至關重要。<br>
+    請注意，這一過程會在總測試時間中增加短暫的延遲，以提升測試結果的準確性。</p>
 
-    <p><strong>Note on Result Accuracy:</strong> Factors such as browser processing and network variability can affect
-        test results, potentially causing discrepancies compared to other methods. For example, browser-based tests
-        might show different timings due to overheads like HTTP(S) request handling. We recommend conducting multiple
-        tests under various conditions for a more comprehensive evaluation.</p>
+<p><strong>準確性：</strong><br>
+    瀏覽器處理速度和網路變化等因素可能會影響測試結果，導致出現些許誤差。<br>
+    例如，瀏覽器在處理 HTTP(S) 請求時的延遲時間。<br>
+    我們建議在不同條件下進行多次測試，以獲得更全面的報告。</p>
 
-    <p>Our tool's strength lies in its <strong>comprehensive range of DNS servers</strong> and <strong>user-friendly
-        interface</strong>, suitable for both technical and non-technical users. While we strive for accuracy, the
-        results are indicative and should be used as a guide to help users choose the best DNS server options based on
-        relative performance in their specific conditions.</p>
+<p><strong>特色：</strong><br>
+    此測試器擁有多個 DNS 伺服器和友好的介面，適合所有使用者，包括非專業人員。<br>
+    儘管力求準確，測試結果僅供參考。此工具旨在幫助使用者根據特定條件下的相對性能選擇最佳的 DNS 伺服器。</p>
+
 </div>
-<footer class="text-center py-3 mt-3 bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-400 relative">
-    <div class="container mx-auto px-4 py-5 text-center">
-        <p class="mb-4">© 2024 - DNSSpeedTest.online. All Rights Reserved.</p>
-        <div class="flex justify-center space-x-4">
-            <a rel="noopener noreferrer" class="github-button" href="https://github.com/BrainicHQ/DoHSpeedTest"
-               data-color-scheme="no-preference: light; light: light; dark: dark;" data-show-count="true"
-               aria-label="Star BrainicHQ/DoHSpeedTest on GitHub">Star</a>
-            <a href="https://www.buymeacoffee.com/silviu" target="_blank" rel="noopener noreferrer"
-               aria-label="Support me on Buy Me a Coffee"
-               class="text-blue-500 hover:underline dark:hover:text-blue-300">
-                ☕️ Support this project
-            </a>
-            <a href="https://brainic.io/?utm_source=dnsspeedtest" target="_blank" title="software company in romania"
-               aria-label="Software development services"
-               class="text-blue-500 hover:underline dark:hover:text-blue-300">
-                💻 Custom Software Solutions
-            </a>
-        </div>
-    </div>
-</footer>
-<script async defer src="https://buttons.github.io/buttons.js"></script>
-<script src="script.js"></script>
+<script src="js/buttons.js"></script>
+<script src="js/chart.js"></script>
+<script src="js/chartjs-plugin-zoom.min.js"></script>
+<script src="js/sweetalert2.all.min.js"></script>
+<script src="js/style.js"></script>
+<script src="js/script.js"></script>
 </body>
 </html>
