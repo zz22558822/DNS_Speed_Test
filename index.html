@@ -106,14 +106,14 @@
             transform: scale(1.1);
         }
 
-        h1, button, p.text-lg.mx-auto{
+        h1, h2, button, p.text-lg.mx-auto, #websiteModal p, #websiteModal button, #websiteModal .selectNone{
             -webkit-user-select: none;
             -moz-user-select: none;
             user-select: none;
             -webkit-user-drag: none;
         }
 
-        .red {
+        .red, .selectNone.hover\:text-black:hover {
             color: rgb(218, 65, 65);
         }
 
@@ -157,7 +157,7 @@
 <!-- Modal -->
 <div id="websiteModal" class="hidden fixed z-50 inset-0 flex items-center justify-center bg-black bg-opacity-60">
     <div class="modal-content relative bg-white pt-4 pb-2 px-4 rounded-lg shadow-xl w-full sm:w-11/12 md:w-1/2 mx-auto my-2 sm:my-4 overflow-hidden dark:bg-gray-700 dark:text-white">
-        <span class="close absolute top-2 right-2 text-3xl font-bold text-gray-500 hover:text-black cursor-pointer p-1 dark:text-gray-200 dark:hover:text-white">×</span>
+        <span class="selectNone close absolute top-2 right-2 text-3xl font-bold text-gray-500 hover:text-black cursor-pointer p-1 dark:text-gray-200 dark:hover:text-white">×</span>
         <h2 class="text-2xl sm:text-3xl mb-2 sm:mb-4 font-semibold dark:text-gray-200">編輯測試主機</h2>
         <p class="text-base sm:text-lg leading-relaxed dark:text-gray-300">
             新增或移除主機名稱以調整 DNS 伺服器測試。
